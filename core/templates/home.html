@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="jumbotron">
+    <h1 class="display-4">Subject and Invigilation Duty Allocator</h1>
+    <p class="lead">A comprehensive system for managing subject allocation and invigilation duties for college faculty.</p>
+    <hr class="my-4">
+    <p>This system helps automate the process of allocating subjects to teachers and managing invigilation duties for exams.</p>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Subject Allocation</h5>
+                <p class="card-text">Allocate subjects to teachers based on seniority, expertise, and application timing.</p>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'apply' %}" class="btn btn-primary">Apply for Subjects</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-primary">Login to Apply</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Invigilation Duty</h5>
+                <p class="card-text">Manage invigilation assignments for exams with preference-based allocation.</p>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'submit-invigilation' %}" class="btn btn-primary">Submit Preferences</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-primary">Login to Submit</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">System Stats</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Teachers: {{ teacher_count }}</li>
+                    <li class="list-group-item">Subjects: {{ subject_count }}</li>
+                    <li class="list-group-item">Exams: {{ exam_count }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

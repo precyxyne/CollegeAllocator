@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Subjects in {{ department.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Subjects in {{ department.name }}</h2>
+    {% if user.is_staff %}
+    <a href="{% url 'subject-create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Add Subject
+    </a>
+    {% endif %}
+</div>
+
+{% if subjects %}
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for subject in subjects %}
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ subject.name }}</h5>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="alert alert-info">
+        No subjects found in {{ department.name }}.
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Applications{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>My Subject Applications</h2>
+    <a href="{% url 'apply' %}" class="btn btn-primary">
+        Apply for New Subject
+    </a>
+</div>
+
+{% if applications %}
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Code</th>
+                    <th>Department</th>
+                    <th>Applied On</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for application in applications %}
+                <tr>
+                    <td>{{ application.subject.name }}</td>
+                    <td>{{ application.subject.code }}</td>
+                    <td>{{ application.subject.department }}</td>
+                    <td>{{ application.timestamp|date:"M d, Y H:i" }}</td>
+                    <td>
+                        {% if application.subject.allocation_set.exists %}
+                            {% if application.subject.allocation_set.first.teacher == application.teacher %}
+                                <span class="badge bg-success">Allocated to You</span>
+                            {% else %}
+                                <span class="badge bg-danger">Allocated to Someone Else</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="badge bg-warning text-dark">Pending</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="alert alert-info">
+        You haven't applied for any subjects yet.
+    </div>
+{% endif %}
+{% endblock %}

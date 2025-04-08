@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load time_tags %}
+
+{% block title %}Submit Invigilation Preference{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header">
+                <h3>Submit Invigilation Preference</h3>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}   
+                    {% load widget_tweaks %}
+                    <div class="mb-3">
+                        {{ form.exam.label_tag }}
+                        {{ form.exam|add_class:"form-control" }}
+                        {% if form.exam.errors %}
+                            <div class="text-danger">
+                                {{ form.exam.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div id="exam-details" class="mb-4 d-none">
+                        <div class="card">
+                            <div class="card-header bg-light">
+                                <h5>Exam Details</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="exam-info">
+                                    <!-- This will be populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.rank.label_tag }}
+                        {{ form.rank|add_class:"form-control" }}
+                        <small class="form-text text-muted">1 = Highest preference, 5 = Lowest preference</small>
+                        {% if form.rank.errors %}
+                            <div class="text-danger">
+                                {{ form.rank.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3 form-check">
+                        {{ form.consecutive_slot_requested|add_class:"form-check-input" }}
+                        {{ form.consecutive_slot_requested.label_tag }}
+                        <div class="form-text">Check this if you would like to be assigned to consecutive exam slots on the same day</div>
+                        {% if form.consecutive_slot_requested.errors %}
+                            <div class="text-danger">
+                                {{ form.consecutive_slot_requested.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'my-invigilation-preferences' %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Submit Preference</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const examSelect = document.getElementById('id_exam');
+    const examDetails = document.getElementById('exam-details');
+    const examInfo = document.getElementById('exam-info');
+    
+    // Store exam data
+    const examData = {
+        {% for exam in exams %}
+        "{{ exam.id }}": {
+            "subject": "{{ exam.subject.name }} ({{ exam.subject.code }})",
+            "date": "{{ exam.date|date:'F j, Y' }}",
+            "timeRange": "{{ exam.start_time|time:'H:i' }} to {{ exam.end_time|time:'H:i' }}",
+            "duration": "{{ exam.end_time|duration:exam.start_time }}",
+            "hall": "{{ exam.hall }}"
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    };
+    
+    // Update exam details when selection changes
+    examSelect.addEventListener('change', function() {
+        const selectedExamId = this.value;
+        
+        if (selectedExamId && examData[selectedExamId]) {
+            const exam = examData[selectedExamId];
+            
+            // Create HTML for exam details
+            const detailsHTML = `
+                <p><strong>Subject:</strong> ${exam.subject}</p>
+                <p><strong>Date:</strong> ${exam.date}</p>
+                <p><strong>Time:</strong> ${exam.timeRange}</p>
+                <p><strong>Duration:</strong> ${exam.duration}</p>
+                <p><strong>Hall:</strong> ${exam.hall}</p>
+            `;
+            
+            examInfo.innerHTML = detailsHTML;
+            examDetails.classList.remove('d-none');
+        } else {
+            examDetails.classList.add('d-none');
+        }
+    });
+    
+    // Trigger change event if exam is pre-selected (e.g., from URL parameter)
+    if (examSelect.value) {
+        examSelect.dispatchEvent(new Event('change'));
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

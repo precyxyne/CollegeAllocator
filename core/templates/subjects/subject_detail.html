@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Subject Details{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Subject Details</h3>
+            </div>
+            <div class="card-body">
+                <h4>{{ subject.name }} ({{ subject.code }})</h4>
+                <p><strong>Department:</strong> {{ subject.department }}</p>
+                <p><strong>Required Expertise:</strong></p>
+                <ul>
+                    {% for expertise in subject.get_required_expertise_list %}
+                    <li>{{ expertise }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="card-footer">
+                {% if user.is_authenticated and not user.is_staff %}
+                <a href="{% url 'apply' %}?subject={{ subject.pk }}" class="btn btn-primary">Apply for this Subject</a>
+                {% endif %}
+                {% if user.is_staff %}
+                <a href="#" class="btn btn-outline-primary">Edit</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Current Allocation</h3>
+            </div>
+            <div class="card-body">
+                {% if allocation %}
+                <p><strong>Teacher:</strong> {{ allocation.teacher }}</p>
+                <p><strong>Academic Year:</strong> {{ allocation.academic_year }}</p>
+                {% else %}
+                <p>This subject has not been allocated yet.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if user.is_staff %}
+        <div class="card">
+            <div class="card-header">
+                <h3>Applications</h3>
+            </div>
+            <div class="card-body">
+                {% if applications %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Teacher</th>
+                                <th>Department</th>
+                                <th>Seniority</th>
+                                <th>Applied On</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for application in applications %}
+                            <tr>
+                                <td>{{ application.teacher.user.get_full_name }}</td>
+                                <td>{{ application.teacher.department }}</td>
+                                <td>{{ application.teacher.seniority }} years</td>
+                                <td>{{ application.timestamp|date:"M d, Y" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p>No applications received yet.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

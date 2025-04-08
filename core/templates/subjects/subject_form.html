@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Add{% endif %} Subject{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header">
+                <h3>{% if form.instance.pk %}Edit{% else %}Add{% endif %} Subject</h3>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {% load widget_tweaks %}
+                    <div class="mb-3">
+                        {{ form.name.label_tag }}
+                        {{ form.name|add_class:"form-control" }}
+                        {% if form.name.errors %}
+                            <div class="text-danger">
+                                {{ form.name.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.code.label_tag }}
+                        {{ form.code|add_class:"form-control" }}
+                        {% if form.code.errors %}
+                            <div class="text-danger">
+                                {{ form.code.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.department.label_tag }}
+                        {{ form.department|add_class:"form-control" }}
+                        {% if form.department.errors %}
+                            <div class="text-danger">
+                                {{ form.department.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.required_expertise.label_tag }}
+                        {{ form.required_expertise|add_class:"form-control" }}
+                        <small class="form-text text-muted">Enter comma-separated list of required expertise areas</small>
+                        {% if form.required_expertise.errors %}
+                            <div class="text-danger">
+                                {{ form.required_expertise.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'subject-list' %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

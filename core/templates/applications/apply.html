@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Apply for Subject{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="card">
+            <div class="card-header">
+                <h3>Apply for Subject</h3>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {% load widget_tweaks %}
+                    <div class="mb-3">
+                        {{ form.subject.label_tag }}
+                        {{ form.subject|add_class:"form-control" }}
+                        {% if form.subject.errors %}
+                            <div class="text-danger">
+                                {{ form.subject.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit Application</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Add timestamp to form submission
+        $('form').submit(function() {
+            var now = new Date();
+            $('<input>').attr({
+                type: 'hidden',
+                name: 'timestamp',
+                value: now.toISOString()
+            }).appendTo('form');
+        });
+    });
+</script>
+{% endblock %}

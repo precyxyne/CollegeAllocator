@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load time_tags %}
+
+{% block title %}Invigilation Allocations{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Invigilation Allocations</h2>
+    {% if user.is_staff %}
+    <a href="{% url 'allocate-invigilation' %}" class="btn btn-primary">
+        <i class="bi bi-gear"></i> Run Allocation Algorithm
+    </a>
+    {% endif %}
+</div>
+
+<!-- Filter Form -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5><i class="bi bi-funnel"></i> Filter Allocations</h5>
+    </div>
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label for="date" class="form-label">Date</label>
+                <input type="date" class="form-control" id="date" name="date" value="{{ request.GET.date|default:'' }}">
+            </div>
+            <div class="col-md-4">
+                <label for="start_time_after" class="form-label">Start Time After</label>
+                <input type="time" class="form-control" id="start_time_after" name="start_time_after" value="{{ request.GET.start_time_after|default:'' }}">
+            </div>
+            <div class="col-md-4">
+                <label for="teacher" class="form-label">Teacher</label>
+                <select class="form-select" id="teacher" name="teacher">
+                    <option value="">All Teachers</option>
+                    {% for teacher in teachers %}
+                    <option value="{{ teacher.id }}" {% if request.GET.teacher == teacher.id|stringformat:"i" %}selected{% endif %}>{{ teacher.user.get_full_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 mt-3">
+                <button type="submit" class="btn btn-primary">Apply Filters</button>
+                <a href="{% url 'invigilation-allocation-list' %}" class="btn btn-outline-secondary">Clear Filters</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if allocations %}
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Exam</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Duration</th>
+                    <th>Hall</th>
+                    <th>Teacher</th>
+                    <th>Department</th>
+                    <th>Preference Rank</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for allocation in allocations %}
+                <tr>
+                    <td>{{ allocation.exam.subject.name }}</td>
+                    <td>{{ allocation.exam.date }}</td>
+                    <td>{{ allocation.exam.start_time|time:"H:i" }} to {{ allocation.exam.end_time|time:"H:i" }}</td>
+                    <td>{{ allocation.exam.end_time|duration:allocation.exam.start_time }}</td>
+                    <td>{{ allocation.exam.hall }}</td>
+                    <td>{{ allocation.teacher.user.get_full_name }}</td>
+                    <td>{{ allocation.teacher.department }}</td>
+                    <td>
+                        {% if allocation.preference %}
+                            <span class="badge bg-primary">{{ allocation.preference.rank }}</span>
+                        {% else %}
+                            <span class="badge bg-secondary">No Preference</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="alert alert-info">
+        No invigilation allocations found matching your criteria.
+    </div>
+{% endif %}
+{% endblock %}
